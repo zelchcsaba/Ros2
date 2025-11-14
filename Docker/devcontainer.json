@@ -1,0 +1,38 @@
+{
+    "name": "ROS 2 Humble Workspace",
+    "remoteUser": "rosdev",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "USERNAME": "rosdev",
+            "GID": "1000",
+            "UID": "1000"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cpptools",
+                "ranch-hand-robotics.rde-ros-2"
+            ],
+            "settings": {
+                "files.associations": {
+                    "*.rviz": "yaml",
+                    "*.srdf": "xml",
+                    "*.urdf": "xml",
+                    "*.xacro": "xml"
+                }
+            }
+        }
+    },
+    "workspaceFolder": "/home/rosdev/ros2_ws",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/rosdev/ros2_ws/src/HaziFeladat,type=bind",
+    "mounts": [
+        // "type=bind,source=${localWorkspaceFolder}/.devcontainer/certs,target=/tmp/certs,readonly"
+    ],
+    "runArgs": [
+        "--net=host"
+    ],
+    "postCreateCommand": "bash src/HaziFeladat/.devcontainer/init-corporate-trust.sh && bash src/HaziFeladat/.devcontainer/download-ros-dependencies.sh"
+}
