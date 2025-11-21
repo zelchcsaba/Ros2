@@ -14,9 +14,9 @@ def generate_launch_description():
                 PathJoinSubstitution([FindExecutable(name="xacro")]),
                 " ",
                 os.path.join(
-                    get_package_share_directory("kuka_agilus_support"),
+                    get_package_share_directory("kuka_lbr_iisy_support"),
                     "urdf",
-                    "kr10_r1100_2.urdf.xacro",
+                    "lbr_iisy3_r760.urdf.xacro",
                 ),
                 " mode:=mock",
             ],
@@ -34,7 +34,7 @@ def generate_launch_description():
                 "config",
                 "ros2_controller_config.yaml",
             ),
-            {"hardware_components_initial_state": {"unconfigured": ["kr10_r1100_2"]}},
+            {"hardware_components_initial_state": {"unconfigured": ["lbr_iisy3_r760"]}},
         ],
     )
 
@@ -50,7 +50,7 @@ def generate_launch_description():
                 "driver_config.yaml",
             ),
             {
-                "robot_model": "kr10_r1100_2",
+                "robot_model": "lbr_iisy3_r760",
                 "position_controller_name": "my_controller",
             },
         ],

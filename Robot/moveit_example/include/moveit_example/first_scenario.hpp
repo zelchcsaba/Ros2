@@ -67,9 +67,9 @@ void FirstScenario(
     msg.orientation.z = 0.0;
     msg.orientation.w = std::cos(Constants::PI / 2);
 
-    msg.position.x = 0.6;
-    msg.position.y = 0.5;
-    msg.position.z = 1.0;
+    msg.position.x = 0.4;
+    msg.position.y = 0.2;
+    msg.position.z = 0.0;
     return msg;
   }();
 

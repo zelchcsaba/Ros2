@@ -7,82 +7,119 @@
 
 #include "moveit_example/utils.hpp"
 
+moveit_msgs::msg::CollisionObject MakePawn(const std::string &id, double x, double y, double z)
+{
+    moveit_msgs::msg::CollisionObject pawn;
+    pawn.id = id;
+    pawn.header.frame_id = "world";
+
+    pawn.primitives.resize(1);
+    pawn.primitives[0].type = shape_msgs::msg::SolidPrimitive::CYLINDER;
+    pawn.primitives[0].dimensions = {0.05, 0.015};  // height, radius
+
+    pawn.primitive_poses.resize(1);
+    pawn.primitive_poses[0].position.x = x;
+    pawn.primitive_poses[0].position.y = y;
+    pawn.primitive_poses[0].position.z = z + 0.025; // ráül a mezőre
+    pawn.primitive_poses[0].orientation.w = 1.0;
+
+    pawn.operation = moveit_msgs::msg::CollisionObject::ADD;
+    return pawn;
+}
+
 void SetupScene()
 {
   const auto [objects, colors] = []
-  {
-    std::vector<moveit_msgs::msg::CollisionObject> objects(3);
+{
+    constexpr int N = 8;
+    constexpr double cell_size = 0.04;   // 4 cm
+    constexpr double height = 0.02;      // 2 cm
 
-    // Place first table
-    objects[0].id = "table1";
-    objects[0].header.frame_id = "world";
-    objects[0].primitives.resize(1);
-    objects[0].primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
-    objects[0].primitives[0].dimensions.resize(3);
-    objects[0].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_X] = 0.4;
-    objects[0].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Y] = 0.4;
-    objects[0].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Z] = 0.4;
-    objects[0].primitive_poses.resize(1);
-    objects[0].primitive_poses[0].position.x = 0.6;
-    objects[0].primitive_poses[0].position.y = -0.25;
-    objects[0].primitive_poses[0].position.z = 0.2;
-    objects[0].primitive_poses[0].orientation.w = 1.0;
-    objects[0].operation = moveit_msgs::msg::CollisionObject::ADD;
+    // -----> A TÁBLA KÖZEPÉNEK POZÍCIÓJA (EZT SZABADON ÁTÍRHATOD) <-----
+    double center_x = 0.3;
+    double center_y = 0.0;
+    double center_z = 0.0;
+    // -----------------------------------------------------------------
 
-    // Place second table
-    objects[1].id = "table2";
-    objects[1].header.frame_id = "world";
-    objects[1].primitives.resize(1);
-    objects[1].primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
-    objects[1].primitives[0].dimensions.resize(3);
-    objects[1].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_X] = 0.4;
-    objects[1].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Y] = 0.4;
-    objects[1].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Z] = 0.4;
-    objects[1].primitive_poses.resize(1);
-    objects[1].primitive_poses[0].position.x = 0.6;
-    objects[1].primitive_poses[0].position.y = 0.25;
-    objects[1].primitive_poses[0].position.z = 0.2;
-    objects[1].primitive_poses[0].orientation.w = 1.0;
-    objects[1].operation = moveit_msgs::msg::CollisionObject::ADD;
+    // Fél tábla mérete a középre igazításhoz
+    constexpr double half_board = (N * cell_size) / 2.0;
 
-    // Place cylinder on the first table
-    objects[2].id = "cylinder";
-    objects[2].header.frame_id = "world";
-    objects[2].primitives.resize(1);
-    objects[2].primitives[0].type = shape_msgs::msg::SolidPrimitive::CYLINDER;
-    objects[2].primitives[0].dimensions.resize(2);
-    objects[2].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::CYLINDER_HEIGHT] = 0.1;
-    objects[2].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::CYLINDER_RADIUS] = 0.02;
-    objects[2].primitive_poses.resize(1);
-    objects[2].primitive_poses[0].position.x = 0.6;
-    objects[2].primitive_poses[0].position.y = 0.25;
-    objects[2].primitive_poses[0].position.z = 0.45 + 1e-3;
-    objects[2].primitive_poses[0].orientation.w = 1.0;
-    objects[2].operation = moveit_msgs::msg::CollisionObject::ADD;
+    // CollisionObject lista
+    std::vector<moveit_msgs::msg::CollisionObject> objects(N * N);
 
-    // Specify the color of each object in the scene
-    std::vector<moveit_msgs::msg::ObjectColor> colors(3);
+    int id = 0;
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            auto& obj = objects[id];
 
-    // Specify the first table's color
-    colors[0].color.r = 1.0;
-    colors[0].color.g = 0.0;
-    colors[0].color.b = 0.0;
-    colors[0].color.a = 1.0;
+            obj.id = "square_" + std::to_string(id);
+            obj.header.frame_id = "world";
 
-    // Specify the second table's color
-    colors[1].color.r = 0.0;
-    colors[1].color.g = 0.0;
-    colors[1].color.b = 1.0;
-    colors[1].color.a = 1.0;
+            // BOX shape
+            obj.primitives.resize(1);
+            obj.primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
+            obj.primitives[0].dimensions = {
+                cell_size,
+                cell_size,
+                height
+            };
 
-    // Specify the cone's color
-    colors[2].color.r = 0.5;
-    colors[2].color.g = 0.0;
-    colors[2].color.b = 0.5;
-    colors[2].color.a = 1.0;
+            // Mező pozíciója a tábla középpontjához viszonyítva
+            obj.primitive_poses.resize(1);
+            obj.primitive_poses[0].position.x =
+                center_x + (j * cell_size - half_board + cell_size / 2.0);
+
+            obj.primitive_poses[0].position.y =
+                center_y + (i * cell_size - half_board + cell_size / 2.0);
+
+            // tábla síkja center_z, a mezők közepe a felette lévő 0.01 m
+            obj.primitive_poses[0].position.z =
+                center_z + height / 2.0;
+
+            obj.primitive_poses[0].orientation.w = 1.0;
+            obj.operation = moveit_msgs::msg::CollisionObject::ADD;
+
+            id++;
+        }
+    }
+
+    // COLORS
+    std::vector<moveit_msgs::msg::ObjectColor> colors(N * N);
+
+    id = 0;
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            auto& col = colors[id];
+
+            bool white = ((i + j) % 2 == 0);
+
+            if (white)
+            {
+                col.color.r = 1.0;
+                col.color.g = 1.0;
+                col.color.b = 1.0;
+                col.color.a = 1.0;
+            }
+            else
+            {
+                col.color.r = 0.0;
+                col.color.g = 0.0;
+                col.color.b = 0.0;
+                col.color.a = 1.0;
+            }
+
+            col.id = "square_" + std::to_string(id);
+
+            id++;
+        }
+    }
 
     return std::make_pair(objects, colors);
-  }();
+}();
 
   // Add the collision objects to the scene
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
@@ -104,43 +141,48 @@ void SecondScenario(
 
   SetupScene();
 
-  // TODO 1
-  // Move the end-effector above the cylinder and make sure that it is facing down
-  //
-  // You have to:
-  // - Find the position of the cylinder
-  // - Create the pick_up_pose
-  // - Move the robot to the specified pose
-  // ...
+   moveit_visual_tools.prompt("Chessboard loaded. Press 'Next' to select a square.");
 
-  // TODO 2
-  // Simulate picking up the cylinder by attaching it to the end-effector
-  // ...
+  // 2) bekérés a felhasználótól
+  std::string target_square;
+  std::cout << "Enter square name (e.g. square_12): ";
+  std::cin >> target_square;
 
-  // TODO 3
-  // Set up orientation constraint to keep end-effector pointing down during movement
-  //
-  // You have to:
-  // - Describe the constraint with some tolerance
-  // - Apply this constraint to the move_group_interface
-  // ...
+  RCLCPP_INFO(logger, "User selected: %s", target_square.c_str());
 
-  // TODO 4
-  // Move the end-effector above the other table (i.e. table1)
-  //
-  // You have to:
-  // - Find the position of table1
-  // - Create the drop_off_pose
-  // - Move the robot to the specified pose
-  // ...
+  // 3) pozíció lekérése
+  geometry_msgs::msg::Point pos = GetObjectPosition(target_square);
 
-  // TODO 5
-  // Drop the cylinder onto the table by detaching it from the robot
-  // ...
+  // 4) bábu létrehozása és megjelenítése
+  moveit_msgs::msg::CollisionObject pawn =
+      MakePawn("pawn_white", pos.x, pos.y, pos.z);
 
-  // Clear path constraints
-  move_group_interface.clearPathConstraints();
+  moveit::planning_interface::PlanningSceneInterface psi;
+  psi.applyCollisionObject(pawn);
 
-  // Move to the home position
+  RCLCPP_INFO(logger, "Pawn placed on %s", target_square.c_str());
+
+  moveit_visual_tools.prompt("Pawn added. Press 'Next' to move the robot to this square.");
+
+  const auto pawn_pos = GetObjectPosition("pawn_white");
+
+  geometry_msgs::msg::Pose pick_up_pose;
+
+  pick_up_pose.orientation.x = 0.0;
+  pick_up_pose.orientation.y = std::sin(Constants::PI / 2);
+  pick_up_pose.orientation.z = 0.0;
+  pick_up_pose.orientation.w = std::cos(Constants::PI / 2);
+
+  pick_up_pose.position.x = pawn_pos.x;
+  pick_up_pose.position.y = pawn_pos.y;
+  pick_up_pose.position.z = pawn_pos.z + 0.06;  // nagyobb magasság
+
+  MoveToPose(pick_up_pose, move_group_interface, moveit_visual_tools, logger);
+
+  moveit_visual_tools.prompt("Done. Press 'Next' to return to home pose.");
+
   MoveToHome(move_group_interface, moveit_visual_tools, logger);
 }
+
+
+

@@ -47,11 +47,6 @@ int main(int argc, char *argv[])
   MoveToHome(move_group_interface, logger);
 
   // First scenario
-  FirstScenario(move_group_interface, moveit_visual_tools, logger);
-  ClearScene(moveit_visual_tools);
-  MoveToHome(move_group_interface, logger);
-
-  // Second scenario
   SecondScenario(move_group_interface, moveit_visual_tools, logger);
   ClearScene(moveit_visual_tools);
   MoveToHome(move_group_interface, logger);
