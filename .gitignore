@@ -1,0 +1,35 @@
+# ROS2 build, log és install könyvtárak
+/build/
+/install/
+/log/
+
+# VSCode konfigurációk és cache
+.vscode/
+*.code-workspace
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# CMake cache és ideiglenes fájlok
+CMakeFiles/
+CMakeCache.txt
+*.cmake
+*.swp
+*.swo
+
+# Eclipse / JetBrains / más IDEk
+*.iml
+.idea/
+
+# nagy vagy ideiglenes fájlok
+*.db
+*.sqlite
+*.tmp
+*.bak
+*.log
+
+# Mac / Linux OS fájlok
+.DS_Store
+Thumbs.db
