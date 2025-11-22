@@ -1,4 +1,0 @@
-my_controller:
-  ros__parameters:
-    max_velocity: 0.2  # rad/s
-    kp: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]

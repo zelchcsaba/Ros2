@@ -1,9 +1,0 @@
-controller_manager:
-  ros__parameters:
-    update_rate: 250  # Hz
-
-    joint_state_broadcaster:
-      type: joint_state_broadcaster/JointStateBroadcaster
-
-    my_controller:
-      type: my_controller/MyController

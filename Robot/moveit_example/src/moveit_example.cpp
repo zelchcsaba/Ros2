@@ -8,7 +8,6 @@
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 
 #include "moveit_example/utils.hpp"
-#include "moveit_example/first_scenario.hpp"
 #include "moveit_example/second_scenario.hpp"
 
 int main(int argc, char *argv[])
@@ -47,7 +46,7 @@ int main(int argc, char *argv[])
   MoveToHome(move_group_interface, logger);
 
   // First scenario
-  SecondScenario(move_group_interface, moveit_visual_tools, logger);
+  Move_Piece(move_group_interface, moveit_visual_tools, logger);
   ClearScene(moveit_visual_tools);
   MoveToHome(move_group_interface, logger);
 
